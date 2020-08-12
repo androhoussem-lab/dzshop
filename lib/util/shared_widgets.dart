@@ -1,0 +1,21 @@
+import 'package:dzshop/util/custom_theme.dart';
+import 'package:flutter/material.dart';
+
+Widget ButtonStyle({
+  @required BuildContext context,
+  @required Widget child ,
+  @required Function onPressed}){
+  return SizedBox(
+    width: MediaQuery.of(context).size.width,
+    height: 50,
+    child: MaterialButton(
+      color: CustomTheme.CUSTOM_THEME.primaryColor,
+        child: child,
+        onPressed: onPressed,
+        shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(32))
+    ),
+        
+    ),
+  );
+}
