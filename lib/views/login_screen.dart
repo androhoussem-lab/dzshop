@@ -1,8 +1,11 @@
+import 'package:dzshop/providers/authentication.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:dzshop/views/register_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -15,8 +18,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _emailController;
   TextEditingController _passwordController;
+  Authentication _authentication;
   @override
   void initState() {
+    _authentication = Authentication();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
@@ -136,5 +141,17 @@ class _LoginScreenState extends State<LoginScreen> {
         return null;
       },
     );
+  }
+
+  void _login(){
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    _authentication.login(email, password).then((value) => {
+      if(value != null && value.api_token != null){
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()))
+      }
+    }).catchError((onError){
+
+    });
   }
 }

@@ -14,7 +14,7 @@ Widget _nextScreen;
 if(_seen == null || ! _seen){
   _nextScreen = OnBoardingScreen();
 }else{
-  int _userId = _sharedPreferences.getInt('user_id');
+  int _userId = _sharedPreferences.getInt('userId');
   if(_userId == null){
     _nextScreen = RegisterScreen();
   }else{

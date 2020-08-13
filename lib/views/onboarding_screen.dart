@@ -2,6 +2,7 @@ import 'package:dzshop/models/on_boarding.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/views/register_screen.dart';
 import 'package:flutter/material.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   @override
@@ -61,10 +62,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         _setButtonText(),
                         style: TextStyle(color: Colors.white, fontSize: _wigetSize.buttonFontSize),
                       ),
-                      onPressed: () {
+                      onPressed: () async{
                         if(_currentPosition != _onBordingList.length -1){
                           _pageViewController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
                         }else{
+                          //SharedPreferences sharedPreference =await SharedPreferences.getInstance();
+                          //sharedPreference.setBool('seen', true);
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
                         }
                       }),

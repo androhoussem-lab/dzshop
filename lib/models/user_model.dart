@@ -9,8 +9,8 @@ class User{
   //constructor for api
 User.fromJson(Map<String,dynamic>jsonObject){
   this.user_id = jsonObject['user_id'];
-  this.name = jsonObject['name'];
-  this.email = jsonObject['email'];
+  this.name = jsonObject['user_name'];
+  this.email = jsonObject['user_email'];
   this.api_token = jsonObject['api_token'];
 }
 

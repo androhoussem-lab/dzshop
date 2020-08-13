@@ -1,8 +1,12 @@
+import 'package:dzshop/models/user_model.dart';
+import 'package:dzshop/providers/authentication.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/util/shared_widgets.dart';
+import 'package:dzshop/views/home_screen.dart';
 import 'package:dzshop/views/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -13,11 +17,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   ScreenConfiguration _screenConfiguration;
   WidgetSize _widgetSize;
   final _formKey = GlobalKey<FormState>();
+  bool _formValidator = true;
   TextEditingController _nameController;
   TextEditingController _emailController;
   TextEditingController _passwordController;
+  bool _enabled = true;
+  Authentication _authentication;
   @override
   void initState() {
+    _authentication = Authentication();
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
@@ -45,6 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Padding(
         padding: EdgeInsets.all(32),
         child: Form(
+          autovalidate: _formValidator,
           key: _formKey,
           child: Column(
             children: [
@@ -64,7 +73,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Nom complet",
                   controller: _nameController,
                   keyboardType: TextInputType.text,
-                  maxLength: 25),
+                  maxLength: 25,
+              enabled: _enabled),
               SizedBox(
                 height: 16,
               ),
@@ -72,7 +82,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Email",
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  maxLength: 25),
+                  maxLength: 25,
+              enabled: _enabled),
               SizedBox(
                 height: 16,
               ),
@@ -80,17 +91,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Mot de passe",
                   controller: _passwordController,
                   keyboardType: TextInputType.text,
-                  maxLength: 14),
+                  maxLength: 14,
+              enabled: _enabled),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.1,
               ),
               ButtonStyle(
                   context: context,
-                  child: Text(
+                  child: (_enabled == true)?Text(
                     'Enregistrer',
                     style: CustomTheme.TEXT_THEME.button,
-                  ),
-                  onPressed: () {}),
+                  ):CircularProgressIndicator(),
+                  onPressed: () async{
+                    if(! _formKey.currentState.validate()){
+                      setState(() {
+                        _formValidator = false;
+                      });
+                    }else{
+                      setState(() {
+                        _enabled = false;
+                      });
+                      _register();
+                    }
+
+                  }),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.01,
               ),
@@ -145,6 +169,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
           return '* Email non valide';
         }
         return null;
+      },
+    );
+  }
+
+  void _register(){
+    String name = _nameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    _authentication.register(name, email, password).then((value) async{
+      if(value != null || value.api_token == null){
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        sharedPreferences.setString('apiToken', value.api_token);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+      }
+    }).catchError((error){
+      _showAlert(context,error.toString());
+      setState(() {
+        _enabled = true;
+      });
+    });
+  }
+  Future<void> _showAlert(BuildContext context , String message) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Erreur dans l\'opération'),
+          content:  Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }
