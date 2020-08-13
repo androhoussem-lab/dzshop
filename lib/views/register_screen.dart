@@ -1,4 +1,3 @@
-import 'package:dzshop/models/user_model.dart';
 import 'package:dzshop/providers/authentication.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/screen_configuration.dart';
@@ -21,8 +20,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController _nameController;
   TextEditingController _emailController;
   TextEditingController _passwordController;
-  bool _enabled = true;
   Authentication _authentication;
+  bool _enabled = true;
   @override
   void initState() {
     _authentication = Authentication();
@@ -49,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
+      body:SingleChildScrollView(
           child: Padding(
         padding: EdgeInsets.all(32),
         child: Form(
@@ -74,7 +73,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _nameController,
                   keyboardType: TextInputType.text,
                   maxLength: 25,
-              enabled: _enabled),
+                enabled : _enabled,
+              ),
               SizedBox(
                 height: 16,
               ),
@@ -83,7 +83,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   maxLength: 25,
-              enabled: _enabled),
+                enabled : _enabled,
+             ),
               SizedBox(
                 height: 16,
               ),
@@ -92,17 +93,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   keyboardType: TextInputType.text,
                   maxLength: 14,
-              enabled: _enabled),
+                enabled : _enabled,),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.1,
               ),
               ButtonStyle(
                   context: context,
-                  child: (_enabled == true)?Text(
+                  child: (_enabled)?Text(
                     'Enregistrer',
                     style: CustomTheme.TEXT_THEME.button,
-                  ):CircularProgressIndicator(),
-                  onPressed: () async{
+                  ):CircularProgressIndicator(
+                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)
+                  ),
+                  onPressed: (_enabled)?() async{
                     if(! _formKey.currentState.validate()){
                       setState(() {
                         _formValidator = false;
@@ -111,10 +114,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       setState(() {
                         _enabled = false;
                       });
-                      _register();
+                      _register(context);
                     }
 
-                  }),
+                  }:(){}),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.01,
               ),
@@ -148,16 +151,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController controller,
       int maxLength,
       TextInputType keyboardType,
-      bool enabled}) {
+        bool enabled
+      }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
+        enabled: enabled,
         focusColor: Color(0xFFfe5c45),
       ),
       maxLength: maxLength,
-      enabled: enabled,
       validator: (content) {
         if (content.isEmpty || content == '') {
           return '* Ce champ est obligatoire';
@@ -173,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _register(){
+  void _register(BuildContext context){
     String name = _nameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
@@ -184,29 +188,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
       }
     }).catchError((error){
-      _showAlert(context,error.toString());
+      showAlert(
+        context: context,
+        title: 'Erreur dans l\'opération',
+        content: error.toString()
+      );
       setState(() {
         _enabled = true;
       });
     });
   }
-  Future<void> _showAlert(BuildContext context , String message) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Erreur dans l\'opération'),
-          content:  Text(message),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 }

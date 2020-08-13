@@ -16,9 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   ScreenConfiguration _screenConfiguration;
   WidgetSize _widgetSize;
   final _formKey = GlobalKey<FormState>();
+  bool _formValidator = false;
   TextEditingController _emailController;
   TextEditingController _passwordController;
   Authentication _authentication;
+  bool _enabled = true;
   @override
   void initState() {
     _authentication = Authentication();
@@ -47,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: EdgeInsets.all(32),
             child: Form(
+              autovalidate: _formValidator,
               key: _formKey,
               child: Column(
                 children: [
@@ -66,7 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: "Email",
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      maxLength: 25),
+                      maxLength: 25,
+                  enabled: _enabled),
                   SizedBox(
                     height: 16,
                   ),
@@ -74,17 +78,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: "Mot de passe",
                       controller: _passwordController,
                       keyboardType: TextInputType.text,
-                      maxLength: 14),
+                      maxLength: 14,
+                  enabled: _enabled),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.1,
                   ),
                   ButtonStyle(
                       context: context,
-                      child: Text(
+                      child: (_enabled)?Text(
                         'Login',
                         style: CustomTheme.TEXT_THEME.button,
+                      ):CircularProgressIndicator(
+                          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)
                       ),
-                      onPressed: () {}),
+                      onPressed: (_enabled)? () {
+                        if(!_formKey.currentState.validate()){
+                            setState(() {
+                              _formValidator = true;
+                            });
+                        }else{
+                          setState(() {
+                            _enabled = false;
+                          });
+                          _login(context);
+                        }
+                      }:(){}),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
@@ -143,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _login(){
+  void _login(BuildContext context){
     String email = _emailController.text;
     String password = _passwordController.text;
     _authentication.login(email, password).then((value) => {
@@ -151,7 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()))
       }
     }).catchError((onError){
-
+      setState(() {
+        _enabled = true;
+      });
+      showAlert(context:context,title: 'Erreur dans l\'opération',content: onError.toString());
     });
   }
 }

@@ -53,42 +53,42 @@ class WidgetSize{
       case ScreenSize.Small :
         this.titleFontSize = 20;
         this.bodyFontSize = 12;
-        this.buttonFontSize = 14;
+        this.buttonFontSize = 16;
         this.indicatorWidth = 7;
         this.indicatorHeight=7;
         break;
       case ScreenSize.Medium :
         this.titleFontSize = 28;
         this.bodyFontSize = 14;
-        this.buttonFontSize = 14;
+        this.buttonFontSize = 16;
         this.indicatorWidth = 8;
         this.indicatorHeight=8;
         break;
       case ScreenSize.Large :
         this.titleFontSize = 32;
         this.bodyFontSize = 18;
-        this.buttonFontSize = 16;
+        this.buttonFontSize = 20;
         this.indicatorWidth = 10;
         this.indicatorHeight=10;
         break;
       case ScreenSize.XLarge :
         this.titleFontSize = 32;
         this.bodyFontSize = 18;
-        this.buttonFontSize = 16;
+        this.buttonFontSize = 20;
         this.indicatorWidth = 10;
         this.indicatorHeight=10;
         break;
       case ScreenSize.XXLarge :
         this.titleFontSize = 48;
         this.bodyFontSize = 22;
-        this.buttonFontSize = 20;
+        this.buttonFontSize = 24;
         this.indicatorWidth = 14;
         this.indicatorHeight=14;
         break;
       default:
         this.titleFontSize = 32;
         this.bodyFontSize = 18;
-        this.buttonFontSize = 24;
+        this.buttonFontSize = 20;
         this.indicatorWidth = 10;
         this.indicatorHeight=10;
         break;
