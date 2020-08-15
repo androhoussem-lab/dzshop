@@ -1,7 +1,8 @@
-import 'package:dzshop/providers/authentication.dart';
+import 'package:dzshop/api/authentication.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/util/shared_widgets.dart';
+import 'package:dzshop/views/address_screen.dart';
 import 'package:dzshop/views/home_screen.dart';
 import 'package:dzshop/views/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -100,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ButtonStyle(
                   context: context,
                   child: (_enabled)?Text(
-                    'Enregistrer',
+                    'Suivent',
                     style: CustomTheme.TEXT_THEME.button,
                   ):CircularProgressIndicator(
                       valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)
@@ -184,8 +185,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _authentication.register(name, email, password).then((value) async{
       if(value != null || value.api_token == null){
         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-        sharedPreferences.setString('apiToken', value.api_token);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+        sharedPreferences.setString('user_token', value.api_token);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>AddressScreen(value.user_id)));
       }
     }).catchError((error){
       showAlert(

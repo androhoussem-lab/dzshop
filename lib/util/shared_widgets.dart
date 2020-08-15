@@ -25,11 +25,12 @@ Future<void> showAlert({BuildContext context ,String title, String content}) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(title),
-        content:  Text(content),
+        title: Text(title , style: TextStyle(color: Colors.white),),
+        backgroundColor: CustomTheme.CUSTOM_THEME.primaryColor,
+        content:  Text(content , style: TextStyle(color: Colors.white),),
         actions: <Widget>[
           FlatButton(
-            child: Text('Ok'),
+            child: Text('OK' , style: TextStyle(color: Colors.white , fontSize: 16),),
             onPressed: () {
               Navigator.of(context).pop();
             },

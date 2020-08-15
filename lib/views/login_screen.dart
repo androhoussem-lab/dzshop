@@ -1,9 +1,10 @@
-import 'package:dzshop/providers/authentication.dart';
+import 'package:dzshop/api/authentication.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:dzshop/views/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
 
@@ -164,9 +165,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login(BuildContext context){
     String email = _emailController.text;
     String password = _passwordController.text;
-    _authentication.login(email, password).then((value) => {
+    _authentication.login(email, password).then((value) async{
       if(value != null && value.api_token != null){
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()))
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        sharedPreferences.setString('user_token', value.api_token);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
       }
     }).catchError((onError){
       setState(() {

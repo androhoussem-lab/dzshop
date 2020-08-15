@@ -2,6 +2,7 @@ import 'package:dzshop/models/on_boarding.dart';
 import 'package:dzshop/util/screen_configuration.dart';
 import 'package:dzshop/views/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingScreen extends StatefulWidget {
@@ -42,7 +43,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   Widget build(BuildContext context) {
     _screenConfiguration = ScreenConfiguration(context);
     _wigetSize = WidgetSize(_screenConfiguration);
-    print(_screenConfiguration.screenSize);
     double _padding = MediaQuery.of(context).size.width * 0.1;
     return Scaffold(
       body: Stack(children: [
@@ -66,8 +66,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         if(_currentPosition != _onBordingList.length -1){
                           _pageViewController.nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
                         }else{
-                          //SharedPreferences sharedPreference =await SharedPreferences.getInstance();
-                          //sharedPreference.setBool('seen', true);
+                          SharedPreferences sharedPreference =await SharedPreferences.getInstance();
+                          sharedPreference.setBool('seen', true);
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
                         }
                       }),
