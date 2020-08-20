@@ -118,7 +118,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       context: context,
                       child: (_enabled)?Text(
                         'Enregistrer',
-                        style: CustomTheme.TEXT_THEME.button,
+                        style: CustomTheme.CUSTOM_THEME.textTheme.button,
                       ):CircularProgressIndicator(
                           valueColor: new AlwaysStoppedAnimation<Color>(Colors.white)
                       ),

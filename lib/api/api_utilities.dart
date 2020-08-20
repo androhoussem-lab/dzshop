@@ -7,4 +7,8 @@ class ApiUtilities{
 
   //Address
   static final String NEW_ADDRESS = MAIN_URL+'new-address';
+  static final String CATEGORIES = MAIN_URL+'categories';
+  static String CATEGORY_PRODUCT(int index){
+    return MAIN_URL+'category/'+index.toString()+'/products';
+  }
 }

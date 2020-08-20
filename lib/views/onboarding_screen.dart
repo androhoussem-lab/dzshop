@@ -46,7 +46,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     double _padding = MediaQuery.of(context).size.width * 0.1;
     return Scaffold(
       body: Stack(children: [
-        _drawPageView(context, _padding , _wigetSize.titleFontSize , _wigetSize.bodyFontSize),
+        _drawPageView(context, _padding , _wigetSize. titleFontSize , _wigetSize.bodyFontSize),
         Align(
           alignment: Alignment.bottomCenter,
           child: Padding(

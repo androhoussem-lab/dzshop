@@ -1,5 +1,6 @@
+import 'package:dzshop/providers/category_provider.dart';
+import 'package:dzshop/providers/home_provider.dart';
 import 'package:dzshop/util/custom_theme.dart';
-import 'package:dzshop/views/address_screen.dart';
 import 'package:dzshop/views/home_screen.dart';
 import 'package:dzshop/views/onboarding_screen.dart';
 import 'package:dzshop/views/register_screen.dart';
@@ -32,10 +33,16 @@ class DzShop extends StatelessWidget {
   DzShop(this._nextScreen);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: CustomTheme.CUSTOM_THEME,
-      debugShowCheckedModeBanner: false,
-      home: this._nextScreen,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: CategoryProvider()),
+        ChangeNotifierProvider.value(value: HomeProvider()),
+      ],
+      child: MaterialApp(
+        theme: CustomTheme.CUSTOM_THEME,
+        debugShowCheckedModeBanner: false,
+        home: this._nextScreen,
+      ),
     );
   }
 }
