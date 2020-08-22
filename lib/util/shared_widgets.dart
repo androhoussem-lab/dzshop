@@ -40,3 +40,12 @@ Future<void> showAlert({BuildContext context ,String title, String content}) {
     },
   );
 }
+
+Widget _drawCircularProgress() {
+  return Container(
+    color: Colors.white,
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+}

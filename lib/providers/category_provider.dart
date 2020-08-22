@@ -7,21 +7,19 @@ import 'dart:convert';
 
 class CategoryProvider extends ChangeNotifier{
   List<CategoryModel> _categories;
-  int _categoryId = 1;
+  int _index = 1;
   bool loading = true;
 
   setCategories(List<CategoryModel> categories) {
-    _categories = categories;
-    setCategoryId(categories[0].category_id);
+    this._categories = categories;
+    //setCategoryId(categories[0].category_id);
     loading = false;
     notifyListeners();
   }
 
   List<CategoryModel> getCategories() => this._categories;
 
-  int getCategoriesLength(){
-    return _categories.length;
-  }
+
   Future<List<CategoryModel>> fetchCategories()async{
    List<CategoryModel> categories = [];
    http.Response response = await http.get(ApiUtilities.CATEGORIES);
@@ -58,12 +56,15 @@ class CategoryProvider extends ChangeNotifier{
   }
 
   void setCategoryId(int index){
-    this._categoryId = index;
-    //loading = true;
+    this._index = index;
     notifyListeners();
   }
 
   getCategoryId(){
-    return this._categories[_categoryId].category_id;
+    return this._categories[_index].category_id;
+  }
+
+  int getCategoriesLength(){
+    return this._categories.length;
   }
 }

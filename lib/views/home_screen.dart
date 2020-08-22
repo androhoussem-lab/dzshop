@@ -1,9 +1,7 @@
 import 'package:dzshop/models/category_model.dart';
 import 'package:dzshop/models/offer_model.dart';
 import 'package:dzshop/models/product_model.dart';
-import 'package:dzshop/providers/category_provider.dart';
 import 'package:dzshop/providers/home_provider.dart';
-import 'package:dzshop/util/shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,104 +10,162 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  //parameters
-  TabController _tabController;
+class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin{
+  //variables
+  int _pageIndex;
   PageController _pageController;
-  int _categoryId = 1;
+  TabController _tabController;
 
-  int _pageIndex = 0;
+  //just for testing
+  List<CategoryModel> _categories = [
+    CategoryModel(1 , 'cat1'),
+    CategoryModel(2 , 'cat2'),
+    CategoryModel(3 , 'cat3'),
+    CategoryModel(4 , 'cat4'),
+    CategoryModel(5 , 'cat5'),
+    CategoryModel(6 , 'cat6'),
+  ];
+  List<OfferModel> offers = [
+    OfferModel(1, 'offer_title', 'assets/images/offer_back.jpg'),
+    OfferModel(3, 'offer_title', 'assets/images/offer_back.jpg'),
+    OfferModel(4, 'offer_title', 'assets/images/offer_back.jpg'),
+    OfferModel(5, 'offer_title', 'assets/images/offer_back.jpg'),
+    OfferModel(6, 'offer_title', 'assets/images/offer_back.jpg'),
+    OfferModel(7, 'offer_title', 'assets/images/offer_back.jpg'),
+  ];
+  List<ProductModel>products = [
+    ProductModel(1, 'product_name', 'assets/images/offer_back.jpg', 43.23),
+    ProductModel(2, 'product_name', 'assets/images/offer_back.jpg', 43.23),
+    ProductModel(3, 'product_name', 'assets/images/offer_back.jpg', 43.23),
+    ProductModel(4, 'product_name', 'assets/images/offer_back.jpg', 43.23),
+    ProductModel(5, 'product_name', 'assets/images/offer_back.jpg', 43.23),
+  ];
 
+
+  //init state
   @override
   void initState() {
-    _pageController = PageController(initialPage: 0, viewportFraction: 1);
-    _fetchCategories(context);
+    _pageIndex = 0;
+    _pageController = PageController(initialPage: 0);
+    _tabController = TabController(length: 6, vsync: this);
     super.initState();
   }
 
+  //dispose
   @override
   void dispose() {
-    Provider.of<CategoryProvider>(context, listen: false).dispose();
-    _tabController.dispose();
     _pageController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
+  //build
   @override
   Widget build(BuildContext context) {
-    _fetchHomeScreen(_categoryId);
-    return _drawHomeScreen(_categoryId);
-  }
 
-  Widget _drawCircularProgress() {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
-
-  //this section for drawing the vue
-  ////////////////////////////////////
-  Widget _drawAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      centerTitle: true,
-      elevation: 0,
-      title: Text(
-        'Découvrir',
-        style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 24),
-      ),
-      actions: [
-        IconButton(
-            icon: Icon(
-              Icons.search,
-              color: Colors.grey.shade700,
-              size: 30,
-            ),
-            onPressed: () {}),
-        Padding(
-          padding: EdgeInsets.only(right: 8.0),
-          child: IconButton(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          'Découvrir',
+          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 24),
+        ),
+        actions: [
+          IconButton(
               icon: Icon(
-                Icons.filter_list,
+                Icons.search,
                 color: Colors.grey.shade700,
                 size: 30,
               ),
               onPressed: () {}),
+          Padding(
+            padding: EdgeInsets.only(right: 8.0),
+            child: IconButton(
+                icon: Icon(
+                  Icons.filter_list,
+                  color: Colors.grey.shade700,
+                  size: 30,
+                ),
+                onPressed: () {}),
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          labelPadding: EdgeInsets.only(right: 24, left: 24),
+          labelColor: Colors.grey.shade900,
+          labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          unselectedLabelColor: Colors.grey.shade400,
+          indicatorColor: Colors.grey.shade400,
+          tabs: _drawTabs(_categories),
+          onTap: (index) {},
         ),
-      ],
-      bottom: _drawTabBar(context),
+      ),
+      drawer: Drawer(
+        child: Container(),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+          SizedBox(
+          height: MediaQuery.of(context).size.height * 0.25,
+            child: _drawPageView()),
+      SizedBox(
+          height: 24,
+      ),
+      Align(
+            alignment: Alignment.topLeft,
+            child: Text('Nouveau collections',
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold))),
+      SizedBox(
+          height: 24,
+      ),
+      SizedBox(
+            height: 200,
+            child: _drawListView(context , products)),
+      SizedBox(
+          height: 24,
+      ),
+      Align(
+            alignment: Alignment.topLeft,
+            child: Text('Best ventes',
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold))),
+      SizedBox(
+          height: 16,
+      ),
+      SizedBox(
+          height: 200,
+          child: _drawListView(context , products),
+      )
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _drawTabBar(BuildContext context) {
-    List<CategoryModel> categories =
-        Provider.of<CategoryProvider>(context).getCategories();
-    return TabBar(
-      controller: _tabController,
-      isScrollable: true,
-      labelPadding: EdgeInsets.only(right: 24, left: 24),
-      labelColor: Colors.grey.shade900,
-      labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      unselectedLabelColor: Colors.grey.shade400,
-      indicatorColor: Colors.grey.shade400,
-      tabs: _drawTabs(categories),
-      onTap: (index) {
-        Provider.of<CategoryProvider>(context, listen: false)
-            .setCategoryId(index);
-        Provider.of<HomeProvider>(context, listen: false).setLoading(true);
-        _categoryId = Provider.of<CategoryProvider>(context, listen: false)
-            .getCategoryId();
-      },
-    );
+  //draw tabs by list
+  List<Tab> _drawTabs(List<CategoryModel> categories) {
+    List<Tab> tabs = [];
+    for (var category in categories) {
+      tabs.add(Tab(text: category.category_name));
+    }
+    return tabs;
   }
 
+  //draw page view for offers
   Widget _drawPageView() {
-    List<OfferModel> offers = Provider.of<HomeProvider>(context, listen: false)
-        .getHomeModel()
-        .category_offers;
+
     return PageView.builder(
       controller: _pageController,
       itemCount: offers.length,
@@ -123,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: NetworkImage(offers[_pageIndex].image_url),
+                        image: ExactAssetImage(offers[_pageIndex].image_url),
                         fit: BoxFit.cover)),
               ),
               Padding(
@@ -164,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  //draw List View for Products
   Widget _drawListView(BuildContext context, List<ProductModel> products) {
     return ListView.builder(
         itemCount: products.length,
@@ -178,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Expanded(
                     child: Image(
-                        image: NetworkImage(products[index].image_url),
+                        image: ExactAssetImage(products[index].image_url),
                         fit: BoxFit.cover)),
                 Padding(
                   padding: const EdgeInsets.only(top: 24.0, bottom: 16),
@@ -213,122 +270,5 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           );
         });
-  }
-
-  List<Tab> _drawTabs(List<CategoryModel> categories) {
-    List<Tab> tabs = [];
-    for (var category in categories) {
-      tabs.add(Tab(text: category.category_name));
-    }
-    return tabs;
-  }
-
-  Widget _drawHomeScreen(int categoryId) {
-    return (Provider.of<CategoryProvider>(context).loading == false)
-        ? Scaffold(
-            appBar: _drawAppBar(context),
-            drawer: Drawer(
-              child: Container(),
-            ),
-            body: (Provider.of<HomeProvider>(context).getLoading() == false)
-                ? SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.25,
-                              child: _drawPageView()),
-                          SizedBox(
-                            height: 24,
-                          ),
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Nouveau collections',
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold))),
-                          SizedBox(
-                            height: 24,
-                          ),
-                          SizedBox(
-                            height: 200,
-                            child: _drawListView(
-                                context,
-                                Provider.of<HomeProvider>(context)
-                                    .getHomeModel()
-                                    .category_products),
-                          ),
-                          SizedBox(
-                            height: 24,
-                          ),
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Best ventes',
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold))),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          SizedBox(
-                            height: 200,
-                            child: _drawListView(
-                                context,
-                                Provider.of<HomeProvider>(context)
-                                    .getHomeModel()
-                                    .category_products),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                : _drawCircularProgress(),
-          )
-        : _drawCircularProgress();
-  }
-
-  //this section for fetching the data
-  ////////////////////////////////////
-
-  _fetchCategories(BuildContext context) {
-    Provider.of<CategoryProvider>(context, listen: false)
-        .fetchCategories()
-        .then((data) {
-      if (data != null) {
-        Provider.of<CategoryProvider>(context, listen: false)
-            .setCategories(data);
-        _tabController = TabController(
-            length: Provider.of<CategoryProvider>(context, listen: false)
-                .getCategoriesLength(),
-            vsync: this);
-        Provider.of<CategoryProvider>(context, listen: false).setCategoryId(0);
-      }
-    }).catchError((error) {
-      showAlert(
-          context: context,
-          title: 'Erreur dans l\'opération',
-          content: error.toString());
-    });
-  }
-
-  _fetchHomeScreen(int categoryId) {
-    Provider.of<HomeProvider>(context, listen: false)
-        .fetchHome(categoryId)
-        .then((data) {
-      if (data != null) {
-        Provider.of<HomeProvider>(context, listen: false).setHomeModel(data);
-        Provider.of<CategoryProvider>(context, listen: false)
-            .setCategoryId(_categoryId);
-        Provider.of<HomeProvider>(context, listen: false).setLoading(false);
-      }
-    }).catchError((error) {
-      showAlert(
-          context: context,
-          title: 'Erreur dans l\'opération',
-          content: error.toString());
-    });
   }
 }

@@ -7,18 +7,23 @@ import 'dart:convert';
 
 class HomeProvider extends ChangeNotifier{
   HomeModel _homeModel ;
-  bool _loading = true;
+
+  bool loading = true;
 
   void setHomeModel(HomeModel homeModel){
     this._homeModel = homeModel;
+    print('setHomeModel');
+    loading = false;
     notifyListeners();
-    setLoading(false) ;
+
   }
 
   HomeModel getHomeModel() => this._homeModel;
 
   Future<HomeModel> fetchHome(int index)async{
+
   http.Response response = await http.get(ApiUtilities.CATEGORY_PRODUCT(index));
+
   switch(response.statusCode){
     case 200:
     case 201:
@@ -47,15 +52,6 @@ class HomeProvider extends ChangeNotifier{
       break;
   }
 
-  }
-
-  setLoading(bool loading){
-    this._loading = loading;
-    notifyListeners();
-  }
-
-  bool getLoading(){
-    return this._loading;
   }
 
 }
