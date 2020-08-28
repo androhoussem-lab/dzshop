@@ -4,7 +4,6 @@ import 'package:dzshop/models/home_model.dart';
 import 'package:dzshop/models/offer_model.dart';
 import 'package:dzshop/models/product_model.dart';
 import 'package:dzshop/providers/category_provider.dart';
-import 'package:dzshop/providers/page_view_provider.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //variables
-  int _pageIndex;
   PageController _pageController;
   TabController _tabController;
 
@@ -36,8 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     fetchCatgories();
-    _pageIndex = 0;
-    _pageController = PageController(initialPage: 0);
+    _pageController = PageController(initialPage: 1, viewportFraction: 0.85);
     _tabController = TabController(length: 6, vsync: this);
     super.initState();
   }
@@ -53,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //build
   @override
   Widget build(BuildContext context) {
-    
     return Selector<CategoryProvider, List<CategoryModel>>(
       selector: (context, categoryProvider) => categoryProvider.getCategories(),
       builder: (context, categories, child) {
@@ -112,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               body: Selector<CategoryProvider, int>(
                   selector: (context, categoryId) => categoryId.getCategoryId(),
                   builder: (context, categoryId, child) {
+                    print('Rebuild');
                     return FutureBuilder<HomeModel>(
                       future: fetchHome(categoryId),
                       builder: (context, snapshot) {
@@ -151,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               style: TextStyle(
                                                   color: Theme.of(context)
                                                       .primaryColor,
-                                                  fontSize: 28,
+                                                  fontSize: 24,
                                                   fontWeight:
                                                       FontWeight.bold))),
                                       SizedBox(
@@ -170,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               style: TextStyle(
                                                   color: Theme.of(context)
                                                       .primaryColor,
-                                                  fontSize: 28,
+                                                  fontSize: 24,
                                                   fontWeight:
                                                       FontWeight.bold))),
                                       SizedBox(
@@ -209,58 +206,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   //draw page view for offers
   Widget _drawPageView(List<OfferModel> offers) {
-    return Consumer<PageProvier>(
-      builder: (context, pageProvier, child) {
-        return PageView.builder(
-          controller: _pageController,
-          itemCount: offers.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              elevation: 5,
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: NetworkImage(offers[_pageIndex].image_url),
-                            fit: BoxFit.cover)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(offers[_pageIndex].offer_title,
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold))),
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: FlatButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Shop now',
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 16),
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    return PageView.builder(
+      controller: _pageController,
+      itemCount: offers.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8))),
+          elevation: 5,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: NetworkImage(offers[index].image_url),
+                        fit: BoxFit.cover)),
               ),
-            );
-          },
-          onPageChanged: (index) {
-            pageProvier.setCurrentPage(index);
-            _pageIndex = pageProvier.currentPage;
-          },
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Flexible(
+                         child: Align(
+                         alignment: Alignment.topLeft,
+                         child: Text(offers[index].offer_title,
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold))),
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: FlatButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Shop now',
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 16),
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -281,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Expanded(
                     child: Image(
-                        image: NetworkImage(products[index].image_url ),
+                        image: NetworkImage(products[index].image_url),
                         fit: BoxFit.cover)),
                 Padding(
                   padding: const EdgeInsets.only(top: 24.0, bottom: 16),

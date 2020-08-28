@@ -1,5 +1,4 @@
 import 'package:dzshop/providers/category_provider.dart';
-import 'package:dzshop/providers/page_view_provider.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/views/home_screen.dart';
 import 'package:dzshop/views/onboarding_screen.dart';
@@ -36,7 +35,6 @@ class DzShop extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: CategoryProvider()),
-        ChangeNotifierProvider.value(value: PageProvier())
       ],
       child: MaterialApp(
         theme: CustomTheme.CUSTOM_THEME,
