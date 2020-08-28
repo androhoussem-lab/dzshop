@@ -1,7 +1,11 @@
+import 'package:dzshop/api/home_resource.dart';
 import 'package:dzshop/models/category_model.dart';
+import 'package:dzshop/models/home_model.dart';
 import 'package:dzshop/models/offer_model.dart';
 import 'package:dzshop/models/product_model.dart';
-import 'package:dzshop/providers/home_provider.dart';
+import 'package:dzshop/providers/category_provider.dart';
+import 'package:dzshop/providers/page_view_provider.dart';
+import 'package:dzshop/util/shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,41 +14,28 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin{
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //variables
   int _pageIndex;
   PageController _pageController;
   TabController _tabController;
 
-  //just for testing
-  List<CategoryModel> _categories = [
-    CategoryModel(1 , 'cat1'),
-    CategoryModel(2 , 'cat2'),
-    CategoryModel(3 , 'cat3'),
-    CategoryModel(4 , 'cat4'),
-    CategoryModel(5 , 'cat5'),
-    CategoryModel(6 , 'cat6'),
-  ];
-  List<OfferModel> offers = [
-    OfferModel(1, 'offer_title', 'assets/images/offer_back.jpg'),
-    OfferModel(3, 'offer_title', 'assets/images/offer_back.jpg'),
-    OfferModel(4, 'offer_title', 'assets/images/offer_back.jpg'),
-    OfferModel(5, 'offer_title', 'assets/images/offer_back.jpg'),
-    OfferModel(6, 'offer_title', 'assets/images/offer_back.jpg'),
-    OfferModel(7, 'offer_title', 'assets/images/offer_back.jpg'),
-  ];
-  List<ProductModel>products = [
-    ProductModel(1, 'product_name', 'assets/images/offer_back.jpg', 43.23),
-    ProductModel(2, 'product_name', 'assets/images/offer_back.jpg', 43.23),
-    ProductModel(3, 'product_name', 'assets/images/offer_back.jpg', 43.23),
-    ProductModel(4, 'product_name', 'assets/images/offer_back.jpg', 43.23),
-    ProductModel(5, 'product_name', 'assets/images/offer_back.jpg', 43.23),
-  ];
-
+  void fetchCatgories() {
+    Provider.of<CategoryProvider>(context, listen: false)
+        .fetchCategories()
+        .then((value) {
+      if (value.length > 0) {
+        Provider.of<CategoryProvider>(context, listen: false)
+            .setCategories(value);
+        Provider.of<CategoryProvider>(context, listen: false).setCategoryId(0);
+      }
+    }).catchError((error) {});
+  }
 
   //init state
   @override
   void initState() {
+    fetchCatgories();
     _pageIndex = 0;
     _pageController = PageController(initialPage: 0);
     _tabController = TabController(length: 6, vsync: this);
@@ -62,95 +53,148 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin{
   //build
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-        title: Text(
-          'Découvrir',
-          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 24),
-        ),
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.grey.shade700,
-                size: 30,
-              ),
-              onPressed: () {}),
-          Padding(
-            padding: EdgeInsets.only(right: 8.0),
-            child: IconButton(
-                icon: Icon(
-                  Icons.filter_list,
-                  color: Colors.grey.shade700,
-                  size: 30,
+    
+    return Selector<CategoryProvider, List<CategoryModel>>(
+      selector: (context, categoryProvider) => categoryProvider.getCategories(),
+      builder: (context, categories, child) {
+        if (categories == null || categories.isEmpty) {
+          return drawCircularProgress();
+        } else {
+          return Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                centerTitle: true,
+                elevation: 0,
+                title: Text(
+                  'Découvrir',
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 24),
                 ),
-                onPressed: () {}),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          labelPadding: EdgeInsets.only(right: 24, left: 24),
-          labelColor: Colors.grey.shade900,
-          labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          unselectedLabelColor: Colors.grey.shade400,
-          indicatorColor: Colors.grey.shade400,
-          tabs: _drawTabs(_categories),
-          onTap: (index) {},
-        ),
-      ),
-      drawer: Drawer(
-        child: Container(),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-          SizedBox(
-          height: MediaQuery.of(context).size.height * 0.25,
-            child: _drawPageView()),
-      SizedBox(
-          height: 24,
-      ),
-      Align(
-            alignment: Alignment.topLeft,
-            child: Text('Nouveau collections',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold))),
-      SizedBox(
-          height: 24,
-      ),
-      SizedBox(
-            height: 200,
-            child: _drawListView(context , products)),
-      SizedBox(
-          height: 24,
-      ),
-      Align(
-            alignment: Alignment.topLeft,
-            child: Text('Best ventes',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold))),
-      SizedBox(
-          height: 16,
-      ),
-      SizedBox(
-          height: 200,
-          child: _drawListView(context , products),
-      )
-            ],
-          ),
-        ),
-      ),
+                actions: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.grey.shade700,
+                        size: 30,
+                      ),
+                      onPressed: () {}),
+                  Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: IconButton(
+                        icon: Icon(
+                          Icons.filter_list,
+                          color: Colors.grey.shade700,
+                          size: 30,
+                        ),
+                        onPressed: () {}),
+                  ),
+                ],
+                bottom: TabBar(
+                  controller:
+                      TabController(length: categories.length, vsync: this),
+                  isScrollable: true,
+                  labelPadding: EdgeInsets.only(right: 24, left: 24),
+                  labelColor: Colors.grey.shade900,
+                  labelStyle:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  unselectedLabelColor: Colors.grey.shade400,
+                  indicatorColor: Colors.grey.shade400,
+                  tabs: _drawTabs(categories),
+                  onTap: (index) {
+                    Provider.of<CategoryProvider>(context, listen: false)
+                        .setCategoryId(index);
+                  },
+                ),
+              ),
+              drawer: Drawer(
+                child: Container(),
+              ),
+              body: Selector<CategoryProvider, int>(
+                  selector: (context, categoryId) => categoryId.getCategoryId(),
+                  builder: (context, categoryId, child) {
+                    return FutureBuilder<HomeModel>(
+                      future: fetchHome(categoryId),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return Text(snapshot.connectionState.toString());
+                            break;
+                          case ConnectionState.waiting:
+                            return drawCircularProgress();
+                            break;
+                          case ConnectionState.active:
+                          case ConnectionState.done:
+                            if (snapshot.data == null || !snapshot.hasData) {
+                              return Text('Data List is empty ',
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                  ));
+                            } else {
+                              return SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.25,
+                                          child: _drawPageView(
+                                              snapshot.data.category_offers)),
+                                      SizedBox(
+                                        height: 24,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Nouveau collections',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  fontSize: 28,
+                                                  fontWeight:
+                                                      FontWeight.bold))),
+                                      SizedBox(
+                                        height: 24,
+                                      ),
+                                      SizedBox(
+                                          height: 200,
+                                          child: _drawListView(context,
+                                              snapshot.data.category_products)),
+                                      SizedBox(
+                                        height: 24,
+                                      ),
+                                      Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Best ventes',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  fontSize: 28,
+                                                  fontWeight:
+                                                      FontWeight.bold))),
+                                      SizedBox(
+                                        height: 16,
+                                      ),
+                                      SizedBox(
+                                        height: 200,
+                                        child: _drawListView(context,
+                                            snapshot.data.category_products),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            break;
+                          default:
+                            return Container();
+                        }
+                      },
+                    );
+                  }));
+        }
+      },
     );
   }
 
@@ -164,58 +208,60 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin{
   }
 
   //draw page view for offers
-  Widget _drawPageView() {
-
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: offers.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8))),
-          elevation: 5,
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: ExactAssetImage(offers[_pageIndex].image_url),
-                        fit: BoxFit.cover)),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(offers[_pageIndex].offer_title,
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold))),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: FlatButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Shop now',
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontSize: 16),
-                          )),
+  Widget _drawPageView(List<OfferModel> offers) {
+    return Consumer<PageProvier>(
+      builder: (context, pageProvier, child) {
+        return PageView.builder(
+          controller: _pageController,
+          itemCount: offers.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
+              elevation: 5,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(offers[_pageIndex].image_url),
+                            fit: BoxFit.cover)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(offers[_pageIndex].offer_title,
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold))),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: FlatButton(
+                              onPressed: () {},
+                              child: Text(
+                                'Shop now',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 16),
+                              )),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
+          onPageChanged: (index) {
+            pageProvier.setCurrentPage(index);
+            _pageIndex = pageProvier.currentPage;
+          },
         );
-      },
-      onPageChanged: (index) {
-        setState(() {
-          _pageIndex = index;
-        });
       },
     );
   }
@@ -235,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin{
               children: [
                 Expanded(
                     child: Image(
-                        image: ExactAssetImage(products[index].image_url),
+                        image: NetworkImage(products[index].image_url ),
                         fit: BoxFit.cover)),
                 Padding(
                   padding: const EdgeInsets.only(top: 24.0, bottom: 16),

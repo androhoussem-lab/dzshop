@@ -12,7 +12,6 @@ class CategoryProvider extends ChangeNotifier{
 
   setCategories(List<CategoryModel> categories) {
     this._categories = categories;
-    //setCategoryId(categories[0].category_id);
     loading = false;
     notifyListeners();
   }

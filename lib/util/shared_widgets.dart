@@ -41,7 +41,7 @@ Future<void> showAlert({BuildContext context ,String title, String content}) {
   );
 }
 
-Widget _drawCircularProgress() {
+Widget drawCircularProgress() {
   return Container(
     color: Colors.white,
     child: Center(
