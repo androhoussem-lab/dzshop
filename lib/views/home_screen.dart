@@ -4,6 +4,7 @@ import 'package:dzshop/models/home_model.dart';
 import 'package:dzshop/models/offer_model.dart';
 import 'package:dzshop/models/product_model.dart';
 import 'package:dzshop/providers/category_provider.dart';
+import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,26 +17,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //variables
   PageController _pageController;
-  TabController _tabController;
-
-  void fetchCatgories() {
-    Provider.of<CategoryProvider>(context, listen: false)
-        .fetchCategories()
-        .then((value) {
-      if (value.length > 0) {
-        Provider.of<CategoryProvider>(context, listen: false)
-            .setCategories(value);
-        Provider.of<CategoryProvider>(context, listen: false).setCategoryId(0);
-      }
-    }).catchError((error) {});
-  }
 
   //init state
   @override
   void initState() {
     fetchCatgories();
-    _pageController = PageController(initialPage: 1, viewportFraction: 0.85);
-    _tabController = TabController(length: 6, vsync: this);
+    _pageController = PageController(initialPage: 1, viewportFraction: 1);
     super.initState();
   }
 
@@ -43,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _pageController.dispose();
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -64,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 title: Text(
                   'Découvrir',
                   style: TextStyle(
-                      color: Theme.of(context).primaryColor, fontSize: 24),
+                      color: Theme.of(context).primaryColor, fontSize: 24 ,fontFamily: 'BreeSerif'),
                 ),
                 actions: [
                   IconButton(
@@ -90,11 +76,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       TabController(length: categories.length, vsync: this),
                   isScrollable: true,
                   labelPadding: EdgeInsets.only(right: 24, left: 24),
-                  labelColor: Colors.grey.shade900,
+                  labelColor: CustomTheme.CUSTOM_THEME.primaryColor,
                   labelStyle:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold , fontFamily: 'Montserrat',),
                   unselectedLabelColor: Colors.grey.shade400,
-                  indicatorColor: Colors.grey.shade400,
+                  indicatorColor: Colors.grey.shade300,
+                  indicatorWeight: 4,
+
+                  indicatorPadding: EdgeInsets.zero,
                   tabs: _drawTabs(categories),
                   onTap: (index) {
                     Provider.of<CategoryProvider>(context, listen: false)
@@ -136,45 +125,93 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.25,
-                                          child: _drawPageView(
+                                              0.2,
+                                          child: _drawPageView(context,
                                               snapshot.data.category_offers)),
                                       SizedBox(
-                                        height: 24,
+                                        height: 12,
                                       ),
-                                      Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Text('Nouveau collections',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                  fontSize: 24,
-                                                  fontWeight:
-                                                      FontWeight.bold))),
+                                     Row(
+                                       crossAxisAlignment: CrossAxisAlignment.center,
+                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                       children: [
+                                         Text('Nouveau collections',
+                                             style: TextStyle(
+                                                 color: Theme.of(context)
+                                                     .primaryColor,
+                                                 fontSize: 20,
+                                                 fontFamily: 'Montserrat',
+                                                 fontWeight:
+                                                 FontWeight.bold),),
+                                         FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
+                                             color: Colors.grey.shade500,
+                                             fontFamily: 'Montserrat',
+                                             fontSize: 14,
+                                         fontWeight: FontWeight.bold),)),
+                                       ],
+                                     ),
                                       SizedBox(
-                                        height: 24,
+                                        height: 8,
                                       ),
                                       SizedBox(
-                                          height: 200,
+                                          height: MediaQuery.of(context).size.height * 0.38,
                                           child: _drawListView(context,
                                               snapshot.data.category_products)),
                                       SizedBox(
-                                        height: 24,
+                                        height: 16,
                                       ),
-                                      Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Text('Best ventes',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                  fontSize: 24,
-                                                  fontWeight:
-                                                      FontWeight.bold))),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('Milleur vent',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                fontSize: 20,
+                                                fontFamily: 'Montserrat',
+                                                fontWeight:
+                                                FontWeight.bold),),
+                                          FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
+                                              color: Colors.grey.shade500,
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 14 ,
+                                          fontWeight: FontWeight.bold),)),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      SizedBox(
+                                        height: MediaQuery.of(context).size.height * 0.38,
+                                        child: _drawListView(context,
+                                            snapshot.data.category_products),
+                                      ),
                                       SizedBox(
                                         height: 16,
                                       ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('Milleur Offres',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                fontSize: 20,
+                                                fontFamily: 'Montserrat',
+                                                fontWeight:
+                                                FontWeight.bold),),
+                                          FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
+                                              color: Colors.grey.shade500,
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 14 ,
+                                              fontWeight: FontWeight.bold),)),
+                                        ],
+                                      ),
                                       SizedBox(
-                                        height: 200,
+                                        height: 8,
+                                      ),
+                                      SizedBox(
+                                        height: MediaQuery.of(context).size.height * 0.38,
                                         child: _drawListView(context,
                                             snapshot.data.category_products),
                                       )
@@ -205,12 +242,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   //draw page view for offers
-  Widget _drawPageView(List<OfferModel> offers) {
+  Widget _drawPageView(BuildContext context,List<OfferModel> offers) {
     return PageView.builder(
       controller: _pageController,
       itemCount: offers.length,
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (context, int index) {
         return Card(
+          clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8))),
           elevation: 5,
@@ -219,8 +257,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: NetworkImage(offers[index].image_url),
+                        image:  NetworkImage(offers[index].image_url,),
                         fit: BoxFit.cover)),
+
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -228,12 +267,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Flexible(
-                         child: Align(
-                         alignment: Alignment.topLeft,
-                         child: Text(offers[index].offer_title,
+                      child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(offers[index].offer_title,
                               style: TextStyle(
+                                  fontFamily: 'Montserrat',
                                   color: Theme.of(context).primaryColor,
-                                  fontSize: 24,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold))),
                     ),
                     Align(
@@ -243,8 +283,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: Text(
                             'Shop now',
                             style: TextStyle(
+                                fontFamily: 'Montserrat',
                                 color: Theme.of(context).primaryColor,
-                                fontSize: 16),
+                                fontSize: 16,
+                            fontWeight: FontWeight.bold),
                           )),
                     ),
                   ],
@@ -260,52 +302,81 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //draw List View for Products
   Widget _drawListView(BuildContext context, List<ProductModel> products) {
     return ListView.builder(
-        itemCount: products.length,
-        physics: ClampingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        //gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-        itemBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
+      itemCount: products.length,
+      physics: ClampingScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (context, int index) {
+        return Padding(
+          padding: EdgeInsets.only(left: 8 , right: 8),
+          child: Container(
+            width: 180,
             child: Column(
-              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment:CrossAxisAlignment.start,
               children: [
                 Expanded(
-                    child: Image(
-                        image: NetworkImage(products[index].image_url),
-                        fit: BoxFit.cover)),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24.0, bottom: 16),
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        products[index].product_name,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
+                  child: Container(
+                      child: Image(
+                          image: NetworkImage(products[index].image_url),
+                          fit: BoxFit.cover,
+                        loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: Text('Chargement...'),
+                          );
+                        },)),
                 ),
+                Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16),
+                    child: Text(
+                      products[index].product_name,
+                      style:
+                      TextStyle(fontSize: 18,fontFamily: 'Montserrat',),
+                    )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       products[index].product_price.toString() + ' DA',
                       style: TextStyle(
-                          fontSize: 18,
+                          fontFamily: 'Montserrat',
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor),
                     ),
-                    Text(
-                      '30 %',
+                    (products[index].product_discount == 0.00)?SizedBox():Text(
+                      products[index].product_discount.toString()+'%',
                       style: TextStyle(
-                          fontSize: 18,
+                          fontFamily: 'Montserrat',
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor),
+                          color: Colors.grey.shade500),
                     ),
                   ],
                 ),
               ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
+  }
+
+  //fetch data
+
+  void fetchCatgories() {
+    Provider.of<CategoryProvider>(context, listen: false)
+        .fetchCategories()
+        .then((value) {
+      if (value.length > 0) {
+        Provider.of<CategoryProvider>(context, listen: false)
+            .setCategories(value);
+        Provider.of<CategoryProvider>(context, listen: false).setCategoryId(0);
+      }
+    }).catchError((error) {
+      showAlert(
+          context: context,
+          title: 'Erreur dans l\'opération',
+          content: error.toString());
+    });
   }
 }
