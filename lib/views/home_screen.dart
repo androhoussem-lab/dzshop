@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             } else {
                               return SingleChildScrollView(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(24.0),
                                   child: Column(
                                     children: [
                                       SizedBox(
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                        crossAxisAlignment: CrossAxisAlignment.center,
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                         Text('Nouveau collections',
+                                         Text('Nouveau',
                                              style: TextStyle(
                                                  color: Theme.of(context)
                                                      .primaryColor,
@@ -154,11 +154,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         height: 8,
                                       ),
                                       SizedBox(
-                                          height: MediaQuery.of(context).size.height * 0.38,
+                                          height: MediaQuery.of(context).size.height * 0.35,
                                           child: _drawListView(context,
                                               snapshot.data.category_products)),
                                       SizedBox(
-                                        height: 16,
+                                        height: 8,
                                       ),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         height: 8,
                                       ),
                                       SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.38,
+                                        height: MediaQuery.of(context).size.height * 0.35,
                                         child: _drawListView(context,
                                             snapshot.data.category_products),
                                       ),
@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         height: 8,
                                       ),
                                       SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.38,
+                                        height: MediaQuery.of(context).size.height * 0.35,
                                         child: _drawListView(context,
                                             snapshot.data.category_products),
                                       )
@@ -313,25 +313,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Column(
               crossAxisAlignment:CrossAxisAlignment.start,
               children: [
+                Container(
+                  height: 200,
+                    child: Image(
+                        image: NetworkImage(products[index].image_url),
+                        fit: BoxFit.cover,
+                      loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: Text('Chargement...'),
+                        );
+                      },)),
                 Expanded(
-                  child: Container(
-                      child: Image(
-                          image: NetworkImage(products[index].image_url),
-                          fit: BoxFit.cover,
-                        loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: Text('Chargement...'),
-                          );
-                        },)),
+                  child: Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                      child: Text(
+                        products[index].product_name,
+                        style:
+                        TextStyle(fontSize: 18,fontFamily: 'Montserrat',),
+                      )),
                 ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16),
-                    child: Text(
-                      products[index].product_name,
-                      style:
-                      TextStyle(fontSize: 18,fontFamily: 'Montserrat',),
-                    )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
