@@ -4,9 +4,12 @@ import 'package:dzshop/models/home_model.dart';
 import 'package:dzshop/models/offer_model.dart';
 import 'package:dzshop/models/product_model.dart';
 import 'package:dzshop/providers/category_provider.dart';
+import 'package:dzshop/providers/wishlist_provider.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/shared_widgets.dart';
+import 'package:dzshop/views/product_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,11 +20,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //variables
   PageController _pageController;
+  Color _color = Colors.white;
 
   //init state
   @override
   void initState() {
-    fetchCatgories();
+    fetchCategories();
     _pageController = PageController(initialPage: 1, viewportFraction: 1);
     super.initState();
   }
@@ -36,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //build
   @override
   Widget build(BuildContext context) {
+    print('Rebuild');
     return Selector<CategoryProvider, List<CategoryModel>>(
       selector: (context, categoryProvider) => categoryProvider.getCategories(),
       builder: (context, categories, child) {
@@ -50,7 +55,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 title: Text(
                   'Découvrir',
                   style: TextStyle(
-                      color: Theme.of(context).primaryColor, fontSize: 24 ,fontFamily: 'BreeSerif'),
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 24,
+                      fontFamily: 'BreeSerif'),
                 ),
                 actions: [
                   IconButton(
@@ -77,12 +84,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   isScrollable: true,
                   labelPadding: EdgeInsets.only(right: 24, left: 24),
                   labelColor: CustomTheme.CUSTOM_THEME.primaryColor,
-                  labelStyle:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold , fontFamily: 'Montserrat',),
+                  labelStyle: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Montserrat',
+                  ),
                   unselectedLabelColor: Colors.grey.shade400,
                   indicatorColor: Colors.grey.shade300,
                   indicatorWeight: 4,
-
                   indicatorPadding: EdgeInsets.zero,
                   tabs: _drawTabs(categories),
                   onTap: (index) {
@@ -97,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               body: Selector<CategoryProvider, int>(
                   selector: (context, categoryId) => categoryId.getCategoryId(),
                   builder: (context, categoryId, child) {
-                    print('Rebuild');
+
                     return FutureBuilder<HomeModel>(
                       future: fetchHome(categoryId),
                       builder: (context, snapshot) {
@@ -131,89 +140,121 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       SizedBox(
                                         height: 12,
                                       ),
-                                     Row(
-                                       crossAxisAlignment: CrossAxisAlignment.center,
-                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                       children: [
-                                         Text('Nouveau',
-                                             style: TextStyle(
-                                                 color: Theme.of(context)
-                                                     .primaryColor,
-                                                 fontSize: 20,
-                                                 fontFamily: 'Montserrat',
-                                                 fontWeight:
-                                                 FontWeight.bold),),
-                                         FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
-                                             color: Colors.grey.shade500,
-                                             fontFamily: 'Montserrat',
-                                             fontSize: 14,
-                                         fontWeight: FontWeight.bold),)),
-                                       ],
-                                     ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      SizedBox(
-                                          height: MediaQuery.of(context).size.height * 0.35,
-                                          child: _drawListView(context,
-                                              snapshot.data.category_products)),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('Milleur vent',
+                                          Text(
+                                            'Nouveau',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 fontSize: 20,
                                                 fontFamily: 'Montserrat',
-                                                fontWeight:
-                                                FontWeight.bold),),
-                                          FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
-                                              color: Colors.grey.shade500,
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 14 ,
-                                          fontWeight: FontWeight.bold),)),
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          FlatButton(
+                                              onPressed: () {},
+                                              child: Text(
+                                                'Afficher tout',
+                                                style: TextStyle(
+                                                    color: Colors.grey.shade500,
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
                                         ],
                                       ),
                                       SizedBox(
                                         height: 8,
                                       ),
                                       SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.35,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.35,
+                                          child: _drawListView(context,
+                                              snapshot.data.category_products.sublist(0 , 10))),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Milleur vent',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                fontSize: 20,
+                                                fontFamily: 'Montserrat',
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          FlatButton(
+                                              onPressed: () {},
+                                              child: Text(
+                                                'Afficher tout',
+                                                style: TextStyle(
+                                                    color: Colors.grey.shade500,
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.35,
                                         child: _drawListView(context,
-                                            snapshot.data.category_products),
+                                            snapshot.data.category_products.sublist(0 , 10)),
                                       ),
                                       SizedBox(
                                         height: 16,
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('Milleur Offres',
+                                          Text(
+                                            'Milleur Offres',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 fontSize: 20,
                                                 fontFamily: 'Montserrat',
-                                                fontWeight:
-                                                FontWeight.bold),),
-                                          FlatButton(onPressed: (){}, child: Text('Afficher tout', style: TextStyle(
-                                              color: Colors.grey.shade500,
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 14 ,
-                                              fontWeight: FontWeight.bold),)),
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          FlatButton(
+                                              onPressed: () {},
+                                              child: Text(
+                                                'Afficher tout',
+                                                style: TextStyle(
+                                                    color: Colors.grey.shade500,
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
                                         ],
                                       ),
                                       SizedBox(
                                         height: 8,
                                       ),
                                       SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.35,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.35,
                                         child: _drawListView(context,
-                                            snapshot.data.category_products),
+                                            snapshot.data.category_products.sublist(0 , 10)),
                                       )
                                     ],
                                   ),
@@ -242,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   //draw page view for offers
-  Widget _drawPageView(BuildContext context,List<OfferModel> offers) {
+  Widget _drawPageView(BuildContext context, List<OfferModel> offers) {
     return PageView.builder(
       controller: _pageController,
       itemCount: offers.length,
@@ -257,9 +298,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image:  NetworkImage(offers[index].image_url,),
+                        image: NetworkImage(
+                          offers[index].image_url,
+                        ),
                         fit: BoxFit.cover)),
-
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -286,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 fontFamily: 'Montserrat',
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.bold),
                           )),
                     ),
                   ],
@@ -307,54 +349,86 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, int index) {
         return Padding(
-          padding: EdgeInsets.only(left: 8 , right: 8),
-          child: Container(
-            width: 180,
-            child: Column(
-              crossAxisAlignment:CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 200,
-                    child: Image(
-                        image: NetworkImage(products[index].image_url),
-                        fit: BoxFit.cover,
-                      loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: Text('Chargement...'),
-                        );
-                      },)),
-                Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                      child: Text(
-                        products[index].product_name,
-                        style:
-                        TextStyle(fontSize: 18,fontFamily: 'Montserrat',),
-                      )),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      products[index].product_price.toString() + ' DA',
-                      style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).primaryColor),
+          padding: EdgeInsets.only(left: 8, right: 8),
+          child: GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductScreen(products[index].product_id , products[index].isFavorite)));
+            },
+            child: Container(
+              width: 180,
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          height: 200,
+                          child: Image(
+                            image: NetworkImage(products[index].image_url),
+                            fit: BoxFit.cover,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: Text('Chargement...'),
+                              );
+                            },
+                          )),
+                      Expanded(
+                        child: Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                            child: Text(
+                              products[index].product_name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Montserrat',
+                              ),
+                            )),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            products[index].product_price.toString() + ' DA',
+                            style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).primaryColor),
+                          ),
+                          (products[index].product_discount == 0.00)
+                              ? SizedBox()
+                              : Text(
+                                  products[index].product_discount.toString() +
+                                      '%',
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey.shade500),
+                                ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Consumer<WishListProvider>(
+                      builder: (context, wishList, child) {
+                        return IconButton(
+                            icon: FaIcon(
+                              FontAwesomeIcons.solidHeart,
+                              color:(! products[index].isFavorite)? Colors.white:CustomTheme.CUSTOM_THEME.primaryColor,
+                            ),
+                            onPressed: () {
+                              wishList.addToWishList(products[index]);
+                              print(wishList.wishList);
+                            });
+                      },
                     ),
-                    (products[index].product_discount == 0.00)?SizedBox():Text(
-                      products[index].product_discount.toString()+'%',
-                      style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade500),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -364,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   //fetch data
 
-  void fetchCatgories() {
+  void fetchCategories() {
     Provider.of<CategoryProvider>(context, listen: false)
         .fetchCategories()
         .then((value) {

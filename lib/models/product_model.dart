@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
+
 class ProductModel{
   int product_id;
   String product_name;
   String image_url;
   double product_price;
   double product_discount;
+  bool  isFavorite = false;
 
   ProductModel(
       this.product_id, this.product_name, this.image_url, this.product_price , this.product_discount);
@@ -22,4 +25,73 @@ class ProductModel{
     }
     return imageResource['url'];
   }
+}
+
+class ProductDetails{
+  int product_id;
+  String product_name;
+  List <String> image_url;
+  double product_price;
+  //double product_discount;
+  List<dynamic> optionColors;
+  List<dynamic> optionSizes;
+  String description;
+  bool  isFavorite = false;
+
+  ProductDetails(
+      this.product_id,
+      this.product_name,
+      this.image_url,
+      this.product_price,
+      //this.product_discount,
+       {
+       this.optionColors,
+       this.optionSizes,
+       this.description,
+       this.isFavorite,
+       });
+
+  ProductDetails.fromJson(Map<String,dynamic> jsonObject){
+    this.product_id = jsonObject['product_id'];
+    this.product_name = jsonObject['name'];
+    this.image_url = _getImages(jsonObject['images']);
+    this.product_price = double.tryParse(jsonObject['price'].toString());
+    this.optionColors = getColors(jsonObject['options']);
+    this.optionSizes = getSizes(jsonObject['options']);
+    print(optionSizes);
+    //this.product_discount = double.tryParse(jsonObject['product_discount'].toString());
+    this.description = jsonObject['description'];
+  }
+
+
+
+
+  //get list of images
+  List<String> _getImages(List<dynamic> images){
+    List<String> imageUrls = [];
+    if(images.length == 0){
+      imageUrls.add('https://cdn.pixabay.com/photo/2018/02/01/20/43/shopping-3124078_960_720.jpg');
+      return imageUrls;
+    }
+    for(var image in images){
+        imageUrls.add(image["url"]);
+    }
+    return imageUrls;
+  }
+
+  List<dynamic> getColors(Map<String,dynamic> colors){
+    if(colors.containsKey('color')){ // colors
+      return colors['color'];
+    }else{
+      return null;
+    }
+  }
+  List<dynamic> getSizes(Map<String,dynamic> optionSizes){
+    if(optionSizes.containsKey('size')){ // sizes
+      return optionSizes["size"];
+    }else{
+      return null;
+    }
+  }
+
 }
