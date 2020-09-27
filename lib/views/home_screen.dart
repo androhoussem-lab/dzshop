@@ -8,6 +8,7 @@ import 'package:dzshop/providers/wishlist_provider.dart';
 import 'package:dzshop/util/custom_theme.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:dzshop/views/product_screen.dart';
+import 'package:dzshop/views/shopping_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -156,7 +157,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           FlatButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ShoppingScreen(snapshot.data.category_products)));
+                                              },
                                               child: Text(
                                                 'Afficher tout',
                                                 style: TextStyle(
@@ -195,7 +198,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           FlatButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ShoppingScreen(snapshot.data.category_products)));
+                                              },
                                               child: Text(
                                                 'Afficher tout',
                                                 style: TextStyle(
@@ -234,7 +239,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           FlatButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ShoppingScreen(snapshot.data.category_products)));
+                                              },
                                               child: Text(
                                                 'Afficher tout',
                                                 style: TextStyle(

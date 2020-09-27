@@ -1,7 +1,9 @@
 import 'package:dzshop/api/product_resource.dart';
 import 'package:dzshop/models/product_model.dart';
+import 'package:dzshop/models/review_model.dart';
 import 'package:dzshop/providers/color_provider.dart';
 import 'package:dzshop/providers/size_provider.dart';
+import 'package:dzshop/providers/wishlist_provider.dart';
 import 'package:dzshop/util/shared_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,7 +13,7 @@ class ProductScreen extends StatefulWidget {
   final int _productId;
   final bool _isFavorite;
 
-  ProductScreen(this._productId , this._isFavorite);
+  ProductScreen(this._productId, this._isFavorite);
 
   @override
   _ProductScreenState createState() => _ProductScreenState();
@@ -77,12 +79,18 @@ class _ProductScreenState extends State<ProductScreen> {
                                         elevation: 2,
                                         clipBehavior: Clip.antiAlias,
                                         child: IconButton(
-                                            icon: (widget._isFavorite)?Icon(
-                                              FontAwesomeIcons.solidHeart,
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                            ):Icon(FontAwesomeIcons.heart , color: Theme.of(context).primaryColor,),
-                                            onPressed: () {}),
+                                            icon: (widget._isFavorite)
+                                                ? Icon(
+                                                    FontAwesomeIcons.solidHeart,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                  )
+                                                : Icon(
+                                                    FontAwesomeIcons.heart,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                  ),
+                                            onPressed: null),
                                       )
                                     ],
                                   ),
@@ -115,7 +123,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                   _drawStars(4),
                                   //draw options
                                   _drawOptions(
-                                      context, snapshot.data.optionColors , snapshot.data.optionSizes),
+                                      context,
+                                      snapshot.data.optionColors,
+                                      snapshot.data.optionSizes),
+                                  SizedBox(
+                                    height: 2,
+                                  ),
                                   Text(
                                     'Description de produit',
                                     style: TextStyle(
@@ -134,6 +147,26 @@ class _ProductScreenState extends State<ProductScreen> {
                                       fontSize: 14,
                                     ),
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Reviews',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      IconButton(icon: Icon(Icons.create), onPressed: (){
+
+                                      })
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 2,
+                                  ),
+                                  _drawReview(snapshot.data.reviews)
                                 ],
                               ),
                             ),
@@ -210,7 +243,8 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
-  Widget _drawOptions(BuildContext context, List<dynamic> colors , List<dynamic> sizes) {
+  Widget _drawOptions(
+      BuildContext context, List<dynamic> colors, List<dynamic> sizes) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,56 +328,122 @@ class _ProductScreenState extends State<ProductScreen> {
     }
     return colorsContainers;
   }
+
   List<Widget> _drawSizesList(List<dynamic> sizes) {
-    List<Widget> sizesList=[];
-    for(var size in sizes){
+    List<Widget> sizesList = [];
+    for (var size in sizes) {
       sizesList.add(_drawCircularSizes(size));
     }
     return sizesList;
   }
-//TODO:You must make states management with provider
+
   Widget _drawCircularColor(Color color) {
     return Padding(
       padding: EdgeInsets.only(right: 6),
       child: GestureDetector(
-        onTap: (){
-          Provider.of<ColorProvider>(context , listen: false).setColor(color);
+        onTap: () {
+          Provider.of<ColorProvider>(context, listen: false).setColor(color);
         },
         child: Consumer<ColorProvider>(
-          builder: (context,colorProvider,child){
+          builder: (context, colorProvider, child) {
             return Container(
               width: 30,
               height: 30,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle,border: Border.all(width: 2 , color: (color == colorProvider.color)?Theme.of(context).primaryColor:Colors.white)),
+              decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      width: 2,
+                      color: (color == colorProvider.color)
+                          ? Theme.of(context).primaryColor
+                          : Colors.white)),
             );
           },
         ),
       ),
     );
   }
-//TODO:You must make states management with provider
+
   Widget _drawCircularSizes(String size) {
     return Padding(
       padding: EdgeInsets.only(right: 6),
       child: GestureDetector(
-        onTap: (){
-          Provider.of<SizeProvider>(context , listen: false).setSize(size);
+        onTap: () {
+          Provider.of<SizeProvider>(context, listen: false).setSize(size);
         },
         child: Consumer<SizeProvider>(
-          builder: (context , sizeProvider , child){
+          builder: (context, sizeProvider, child) {
             return Container(
               width: 30,
               height: 30,
               decoration: BoxDecoration(
                 border: Border.all(width: 1),
-                color: (sizeProvider.size == size)?Theme.of(context).primaryColor:Colors.white,
+                color: (sizeProvider.size == size)
+                    ? Theme.of(context).primaryColor
+                    : Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Center(child: Text(size , style: TextStyle(fontSize: 16 , color: (sizeProvider.size == size)?Colors.white:Colors.black), )),
+              child: Center(
+                  child: Text(
+                size,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: (sizeProvider.size == size)
+                        ? Colors.white
+                        : Colors.black),
+              )),
             );
           },
         ),
       ),
     );
+  }
+
+  Widget _drawReview(List<Review> reviews) {
+    if(reviews == null || reviews.isEmpty){
+      return Text('Vide');
+    }else{
+      return Container(
+        height: 150,
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: reviews.length,
+          itemBuilder: (context , index){
+            return Padding(
+              padding:  EdgeInsets.only(bottom:8.0),
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(reviews[index].user.image),
+                                ),
+                                Padding(
+                                  padding:  EdgeInsets.only(left :8.0),
+                                  child: Text(reviews[index].user.name , style: TextStyle(fontSize: 14 , fontWeight: FontWeight.bold),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4,),
+                    Text(reviews[index].review , style: TextStyle(fontSize: 14),),
+                  ],
+                ),
+              ),
+            );
+          }
+        ),
+      );
+    }
   }
 }

@@ -16,3 +16,25 @@ User.fromJson(Map<String,dynamic>jsonObject){
 
 
 }
+
+class UserForReview{
+  int user_id;
+  String name ;
+  String image;
+
+  UserForReview(this.user_id, this.name, this.image);
+  
+  UserForReview.fromJson(Map<String,dynamic> jsonObject){
+    this.user_id = jsonObject['user_id'];
+    this.name = jsonObject['name'];
+    this.image = _getImage(jsonObject['image']);
+  }
+
+  String _getImage(Map<String,dynamic> imageResource){
+    if(imageResource == null){
+      return 'https://cdn.pixabay.com/photo/2018/02/01/20/43/shopping-3124078_960_720.jpg';
+    }
+    return imageResource['url'];
+  }
+}
+

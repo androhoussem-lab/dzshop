@@ -1,3 +1,4 @@
+import 'package:dzshop/models/review_model.dart';
 import 'package:flutter/cupertino.dart';
 
 class ProductModel{
@@ -32,9 +33,10 @@ class ProductDetails{
   String product_name;
   List <String> image_url;
   double product_price;
-  //double product_discount;
+  double product_discount;
   List<dynamic> optionColors;
   List<dynamic> optionSizes;
+  List<Review> reviews;
   String description;
   bool  isFavorite = false;
 
@@ -43,12 +45,13 @@ class ProductDetails{
       this.product_name,
       this.image_url,
       this.product_price,
-      //this.product_discount,
+      this.product_discount,
        {
        this.optionColors,
        this.optionSizes,
        this.description,
        this.isFavorite,
+       this.reviews
        });
 
   ProductDetails.fromJson(Map<String,dynamic> jsonObject){
@@ -59,8 +62,9 @@ class ProductDetails{
     this.optionColors = getColors(jsonObject['options']);
     this.optionSizes = getSizes(jsonObject['options']);
     print(optionSizes);
-    //this.product_discount = double.tryParse(jsonObject['product_discount'].toString());
+    this.product_discount = double.tryParse(jsonObject['product_discount']);
     this.description = jsonObject['description'];
+    this.reviews = _getReviews(jsonObject['reviews']);
   }
 
 
@@ -92,6 +96,18 @@ class ProductDetails{
     }else{
       return null;
     }
+  }
+  List<Review> _getReviews(List<dynamic>reviewsFromJson){
+    List<Review> reviewsList=[];
+    if(reviewsFromJson.length == 0 || reviewsFromJson.isEmpty){
+      return null;
+    }else{
+      for(var item in reviewsFromJson){
+        reviewsList.add(Review.fromJson(item));
+      }
+      return reviewsList;
+    }
+
   }
 
 }
